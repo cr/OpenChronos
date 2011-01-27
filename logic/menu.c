@@ -52,7 +52,9 @@
 #include "date.h"
 #include "alarm.h"
 #include "stopwatch.h"
+#ifdef CONFIG_TEMP
 #include "temperature.h"
+#endif
 #include "altitude.h"
 #include "battery.h"
 //pfs
@@ -134,10 +136,12 @@ u8 update_alarm(void)
 	return (display.flag.update_alarm);
 }
 #endif
+#ifdef CONFIG_TEMP
 u8 update_temperature(void)
 {
 	return (display.flag.update_temperature);
 }
+#endif
 #ifdef CONFIG_BATTERY
 u8 update_battery_voltage(void)
 {
@@ -204,6 +208,7 @@ const struct menu menu_L1_Alarm =
 	FUNCTION(update_alarm),		// new display data
 };
 #endif
+#ifdef CONFIG_TEMP
 // Line1 - Temperature
 const struct menu menu_L1_Temperature =
 {
@@ -213,7 +218,7 @@ const struct menu menu_L1_Temperature =
 	FUNCTION(display_temperature),		// display function
 	FUNCTION(update_temperature),		// new display data
 };
-
+#endif
 #ifdef CONFIG_ALTITUDE
 // Line1 - Altitude
 const struct menu menu_L1_Altitude =
@@ -450,7 +455,9 @@ const struct menu *menu_L1[]={
 	#ifdef CONFIG_ALARM
 	&menu_L1_Alarm,
 	#endif
+	#ifdef CONFIG_TEMP
 	&menu_L1_Temperature,
+	#endif
 	#ifdef CONFIG_ALTITUDE
 	&menu_L1_Altitude,
 	#endif

@@ -60,7 +60,9 @@
 #include "alarm.h"
 #include "stopwatch.h"
 #include "battery.h"
+#ifdef CONFIG_TEMP
 #include "temperature.h"
+#endif
 #include "altitude.h"
 #ifdef FEATURE_PROVIDE_ACCEL
 #include "acceleration.h"
@@ -421,10 +423,10 @@ void init_global_variables(void)
 
 	// Reset SimpliciTI stack
 	reset_rf();
-	
+#ifdef CONFIG_TEMP	
 	// Reset temperature measurement 
 	reset_temp_measurement();
-
+#endif
 	#ifdef CONFIG_BATTERY
 	// Reset battery measurement
 	reset_batt_measurement();
@@ -567,9 +569,10 @@ void wakeup_event(void)
 // *************************************************************************************************
 void process_requests(void)
 {
+#ifdef CONFIG_TEMP
 	// Do temperature measurement
 	if (request.flag.temperature_measurement) temperature_measurement(FILTER_ON);
-	
+#endif
 	// Do pressure measurement
 #ifdef CONFIG_ALTITUDE
   	if (request.flag.altitude_measurement) do_altitude_measurement(FILTER_ON);
@@ -880,7 +883,9 @@ void read_calibration_values(void)
 	{
 		// If no values are available (i.e. INFO D memory has been erased by user), assign experimentally derived values	
 		rf_frequoffset	= 4;
+		#ifdef CONFIG_TEMP
 		sTemp.offset 	= -250;
+		#endif
 		#ifdef CONFIG_BATTERY
 		sBatt.offset 	= -10;	
 		#endif
@@ -900,8 +905,10 @@ void read_calibration_values(void)
 		if ((rf_frequoffset > 20) && (rf_frequoffset < (256-20)))
 		{
 			rf_frequoffset = 0;
-		} 
+		}
+		#ifdef CONFIG_TEMP 
 		sTemp.offset 	= (s16)((cal_data[2] << 8) + cal_data[3]);
+		#endif
 		#ifdef CONFIG_BATTERY
 		sBatt.offset 	= (s16)((cal_data[4] << 8) + cal_data[5]);
 		#endif

@@ -69,9 +69,9 @@
 #ifndef ELIMINATE_BLUEROBIN
 #include "bluerobin.h"
 #endif
-
+#ifdef CONFIG_TEMP
 #include "temperature.h"
-
+#endif
 #ifdef CONFIG_EGGTIMER
 #include "eggtimer.h"
 #endif
@@ -424,10 +424,10 @@ __interrupt void TIMER0_A0_ISR(void)
 		strength_tick();
 	}            
 #endif
-
+#ifdef CONFIG_TEMP
 	// Do a temperature measurement each second while menu item is active
 	if (is_temp_measurement()) request.flag.temperature_measurement = 1;
-	
+#endif
 	// Do a pressure measurement each second while menu item is active
 #ifdef CONFIG_ALTITUDE
 	if (is_altitude_measurement()) 

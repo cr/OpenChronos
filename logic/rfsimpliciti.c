@@ -65,7 +65,9 @@
 #include "clock.h"
 #include "date.h"
 #include "alarm.h"
+#ifdef CONFIG_TEMP
 #include "temperature.h"
+#endif
 #include "vti_ps.h"
 #include "altitude.h"
 
@@ -617,10 +619,10 @@ void start_simpliciti_sync(void)
 	start_altitude_measurement();
 	stop_altitude_measurement();	
 #endif
-		
+#ifdef CONFIG_TEMP
 	// Get updated temperature	
 	temperature_measurement(FILTER_OFF);
-
+#endif
 	// Turn on beeper icon to show activity
 	display_symbol(LCD_ICON_BEEPER1, SEG_ON_BLINK_ON);
 	display_symbol(LCD_ICON_BEEPER2, SEG_ON_BLINK_ON);
@@ -705,13 +707,15 @@ void simpliciti_sync_decode_ap_cmd_callback(void)
 										sAlarm.hour			= simpliciti_data[8];
 										sAlarm.minute		= simpliciti_data[9];
 										#endif
+#ifdef CONFIG_TEMP
 										// Set temperature and temperature offset
 										t1 = (s16)((simpliciti_data[10]<<8) + simpliciti_data[11]);
 										offset = t1 - (sTemp.degrees - sTemp.offset);
 										sTemp.offset  = offset;	
-										sTemp.degrees = t1;									
-										// Set altitude
+										sTemp.degrees = t1;
+#endif
 #ifdef CONFIG_ALTITUDE
+										// Set altitude
 										sAlt.altitude = (s16)((simpliciti_data[12]<<8) + simpliciti_data[13]);
 										update_pressure_table(sAlt.altitude, sAlt.pressure, sAlt.temperature);
 #endif
@@ -789,8 +793,13 @@ void simpliciti_sync_get_data_callback(unsigned int index)
 										simpliciti_data[8]  = 4;
 										simpliciti_data[9]  = 30;
 										#endif
+										#ifdef CONFIG_TEMP
 										simpliciti_data[10] = sTemp.degrees >> 8;
 										simpliciti_data[11] = sTemp.degrees & 0xFF;
+										#else
+										simpliciti_data[10] = 0;
+										simpliciti_data[11] = 0;
+										#endif
 #ifdef CONFIG_ALTITUDE
 										simpliciti_data[12] = sAlt.altitude >> 8;
 										simpliciti_data[13] = sAlt.altitude & 0xFF;

@@ -42,6 +42,8 @@
 // system
 #include "project.h"
 
+#ifdef CONFIG_TEMP
+
 // driver
 #include "temperature.h"
 #include "ports.h"
@@ -352,3 +354,4 @@ void display_temperature(u8 line, u8 update)
 		display_symbol(LCD_SEG_L1_DP1, SEG_OFF);
 	}
 }
+#endif
