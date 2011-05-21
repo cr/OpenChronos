@@ -58,6 +58,9 @@
 #include "menu.h"
 #include "date.h"
 #include "alarm.h"
+#ifdef CONFIG_CYCLE_ALARM
+#include "cycle_alarm.h"
+#endif
 #include "stopwatch.h"
 #include "battery.h"
 #ifdef CONFIG_TEMP
@@ -383,7 +386,12 @@ void init_global_variables(void)
 	// Set alarm time to default value 
 	reset_alarm();
 	#endif
-	
+
+	#ifdef CONFIG_CYCLE_ALARM
+	// Set cycle alarm time to default value 
+	reset_cycle_alarm();
+	#endif
+
 	// Set buzzer to default value
 	reset_buzzer();
 	

@@ -47,16 +47,29 @@
 
 // logic
 #include "menu.h"
+
 #include "user.h"
+
 #include "clock.h"
+
 #include "date.h"
+
+#ifdef CONFIG_CYCLE_ALARM
+#include "cycle_alarm.h"
+#endif
+
 #include "alarm.h"
+
 #include "stopwatch.h"
+
 #ifdef CONFIG_TEMP
 #include "temperature.h"
 #endif
+
 #include "altitude.h"
+
 #include "battery.h"
+
 //pfs
 #ifndef ELIMINATE_BLUEROBIN
 #include "bluerobin.h"
@@ -130,6 +143,12 @@ u8 update_date(void)
 {
 	return (display.flag.update_date);
 }
+#ifdef CONFIG_CYCLE_ALARM
+u8 update_cycle_alarm(void)
+{
+	return (display.flag.update_cycle_alarm);
+}
+#endif
 #ifdef CONFIG_ALARM
 u8 update_alarm(void)
 {
@@ -197,6 +216,18 @@ const struct menu menu_L1_Sidereal =
 };
 #endif
 
+// Line1 - Cycle Alarm
+#ifdef CONFIG_CYCLE_ALARM
+const struct menu menu_L1_CycleAlarm =
+{
+	FUNCTION(sx_cycle_alarm),	// direct function
+	FUNCTION(mx_cycle_alarm),	// sub menu function
+	FUNCTION(nx_cycle_alarm),	// next item function
+	FUNCTION(display_cycle_alarm),	// display function
+	FUNCTION(update_cycle_alarm),	// new display data
+};
+#endif
+
 // Line1 - Alarm
 #ifdef CONFIG_ALARM
 const struct menu menu_L1_Alarm =
@@ -208,6 +239,7 @@ const struct menu menu_L1_Alarm =
 	FUNCTION(update_alarm),		// new display data
 };
 #endif
+
 #ifdef CONFIG_TEMP
 // Line1 - Temperature
 const struct menu menu_L1_Temperature =
@@ -451,6 +483,9 @@ const struct menu *menu_L1[]={
 	#endif
 	#ifdef CONFIG_SIDEREAL
 	&menu_L1_Sidereal,
+	#endif
+	#ifdef CONFIG_CYCLE_ALARM
+	&menu_L1_CycleAlarm,
 	#endif
 	#ifdef CONFIG_ALARM
 	&menu_L1_Alarm,

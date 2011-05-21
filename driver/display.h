@@ -98,6 +98,9 @@ typedef union
     u16 update_temperature   	: 1;    // 1 = Temperature was updated
     u16 update_battery_voltage 	: 1;    // 1 = Battery voltage was updated
     u16 update_date      		: 1;    // 1 = Date was updated
+#ifdef CONFIG_CYCLE_ALARM
+    u16 update_cycle_alarm     		: 1;    // 1 = Cycle Alarm was updated
+#endif
     u16 update_alarm      		: 1;    // 1 = Alarm time was updated
     u16 update_acceleration		: 1; 	// 1 = Acceleration data was updated
   } flag;

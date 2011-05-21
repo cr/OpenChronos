@@ -54,6 +54,9 @@
 
 // logic
 #include "clock.h"
+#ifdef CONFIG_CYCLE_ALARM
+#include "cycle_alarm.h"
+#endif
 #include "alarm.h"
 #include "rfsimpliciti.h"
 #include "simpliciti.h"
@@ -321,6 +324,15 @@ __interrupt void PORT2_ISR(void)
 		if (sAlarm.state == ALARM_ON) 
 		{
 			stop_alarm();
+			button.all_flags = 0;
+		}
+		else 
+		#endif
+		
+		#ifdef CONFIG_CYCLE_ALARM
+		if (sCycleAlarm.state == CYCLE_ALARM_ON) 
+		{
+			stop_cycle_alarm();
 			button.all_flags = 0;
 		}
 		else 

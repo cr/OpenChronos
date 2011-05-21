@@ -56,6 +56,9 @@
 #include "clock.h"
 #include "battery.h"
 #include "stopwatch.h"
+#ifdef CONFIG_CYCLE_ALARM
+#include "cycle_alarm.h"
+#endif
 #include "alarm.h"
 #include "altitude.h"
 #include "display.h"
@@ -400,7 +403,25 @@ __interrupt void TIMER0_A0_ISR(void)
 		}
 	}
 #endif
-	#ifdef CONFIG_ALARM
+
+#ifdef CONFIG_CYCLE_ALARM
+	// Generate alarm signal
+	if (sCycleAlarm.state == CYCLE_ALARM_ON) 
+	{
+		// Decrement alarm duration counter
+		if (sCycleAlarm.duration-- > 0)
+		{
+			request.flag.alarm_buzzer = 1;
+		}
+		else
+		{
+			sCycleAlarm.duration = CYCLE_ALARM_ON_DURATION;
+			stop_cycle_alarm();
+		}
+	}
+#endif
+
+#ifdef CONFIG_ALARM
 	// Generate alarm signal
 	if (sAlarm.state == ALARM_ON) 
 	{
@@ -415,7 +436,7 @@ __interrupt void TIMER0_A0_ISR(void)
 			stop_alarm();
 		}
 	}
-	#endif
+#endif
 
 #ifdef CONFIG_STRENGTH
         // One more second gone by.
