@@ -577,17 +577,19 @@ void wakeup_event(void)
 // *************************************************************************************************
 void process_requests(void)
 {
-#ifdef CONFIG_TEMP
+	#ifdef CONFIG_TEMP
 	// Do temperature measurement
 	if (request.flag.temperature_measurement) temperature_measurement(FILTER_ON);
-#endif
+	#endif
+
 	// Do pressure measurement
-#ifdef CONFIG_ALTITUDE
+	#ifdef CONFIG_ALTITUDE
   	if (request.flag.altitude_measurement) do_altitude_measurement(FILTER_ON);
-#endif
-#ifdef CONFIG_ALTI_ACCUMULATOR
+	#endif
+
+	#ifdef CONFIG_ALTI_ACCUMULATOR
 	if (request.flag.altitude_accumulator) altitude_accumulator_periodic();
-#endif
+	#endif
 	
 	#ifdef FEATURE_PROVIDE_ACCEL
 	// Do acceleration measurement
@@ -603,14 +605,18 @@ void process_requests(void)
 	// Generate alarm (two signals every second)
 	if (request.flag.alarm_buzzer) start_buzzer(2, BUZZER_ON_TICKS, BUZZER_OFF_TICKS);
 	#endif
+
+	#ifdef CONFIG_CYCLE_ALARM
+	// Generate alarm (two signals every second)
+	if (request.flag.cycle_alarm_buzzer) start_buzzer(2, BUZZER_ON_TICKS, BUZZER_OFF_TICKS);
+	#endif
 	
-#ifdef CONFIG_EGGTIMER
+	#ifdef CONFIG_EGGTIMER
 	// Generate alarm (two signals every second)
 	if (request.flag.eggtimer_buzzer) start_buzzer(2, BUZZER_ON_TICKS, BUZZER_OFF_TICKS);
-#endif
-	
-	
-#ifdef CONFIG_STRENGTH
+	#endif
+		
+	#ifdef CONFIG_STRENGTH
 	if (request.flag.strength_buzzer && strength_data.num_beeps != 0) 
 	{
 		start_buzzer(strength_data.num_beeps, 
@@ -618,7 +624,7 @@ void process_requests(void)
 			     STRENGTH_BUZZER_OFF_TICKS);
 		strength_data.num_beeps = 0;
 	}
-#endif
+	#endif
 
 	// Reset request flag
 	request.all_flags = 0;
