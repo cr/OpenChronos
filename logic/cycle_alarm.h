@@ -20,10 +20,18 @@ extern void display_cycle_alarm(u8 line, u8 update);
 // *************************************************************************************************
 // Defines section
 
-// Alarm states
+// Cycle alarm states
 #define CYCLE_ALARM_DISABLED 	(0u)
 #define CYCLE_ALARM_ENABLED	(1u)
 #define CYCLE_ALARM_ON		(2u)
+
+// Cycle alarm app states
+#define CYCLE_ALARM_SHOW_SUM	(0u)
+#define CYCLE_ALARM_WAIT	(1u)
+#define CYCLE_ALARM_SET_DELAY	(2u)
+#define CYCLE_ALARM_SET_LEN	(3u)
+#define CYCLE_ALARM_SET_CYCLES	(4u)
+
 
 // Keep alarm for 10 on-off cycles
 #define CYCLE_ALARM_ON_DURATION	(10u)

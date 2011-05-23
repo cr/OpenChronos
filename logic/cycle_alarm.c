@@ -142,7 +142,11 @@ void stop_cycle_alarm(void)
 // *************************************************************************************************
 void sx_cycle_alarm(u8 line)
 {
-	// UP: Cycle through alarm modes
+	u8 state;
+	s32 cycles;
+	s32 duration;	
+	cycles = 1;
+	// UP: Cycle through cycles
 	if(button.flag.up)
 	{
 		// Toggle alarm state
@@ -186,7 +190,9 @@ void sx_cycle_alarm(u8 line)
 void mx_cycle_alarm(u8 line)
 {
 	u8 select;
-	s32 hours;
+	s32 delay;
+	s32 cyclelen;
+	s32 hour;
 	s32 minutes;
 	u8 * str;
 	
@@ -194,22 +200,11 @@ void mx_cycle_alarm(u8 line)
 	clear_display_all();
 
 	// Keep global values in case new values are discarded
-	hours 		= sCycleAlarm.hour;
-	minutes 	= sCycleAlarm.minute;
-
-	// Display HH:MM (LINE1) 
-	str = itoa(hours, 2, 0);
-	display_chars(LCD_SEG_L1_3_2, str, SEG_ON);
-	display_symbol(LCD_SEG_L1_COL, SEG_ON);
-	
-	str = itoa(minutes, 2, 0);
-	display_chars(LCD_SEG_L1_1_0, str, SEG_ON);
-	
-	// Display "ALARM" (LINE2)
-//	display_chars(LCD_SEG_L2_4_0, (u8 *)"ALARM", SEG_ON);
+	cyclelen	= sCycleAlarm.cyclelen;
+	delay		= sCycleAlarm.delay;
 		
 	// Init value index
-	select = 0;	
+	select = 0;
 		
 	// Loop values until all are set or user breaks	set
 	while(1) 
@@ -221,8 +216,8 @@ void mx_cycle_alarm(u8 line)
 	  if (button.flag.star)
 	  {
 	    // Store local variables in global alarm time
-	    sCycleAlarm.hour = hours;
-	    sCycleAlarm.minute = minutes;
+	    sCycleAlarm.delay = delay;
+	    sCycleAlarm.cyclelen = cyclelen;
 	    // Set display update flag
 	    display.flag.line1_full_update = 1;
 	    break;
@@ -230,13 +225,15 @@ void mx_cycle_alarm(u8 line)
 
 	  switch (select)
 	  {
-	  case 0:		// Set hour
-	    set_value(&hours, 2, 0, 0, 23, SETVALUE_ROLLOVER_VALUE + SETVALUE_DISPLAY_VALUE + SETVALUE_NEXT_VALUE, LCD_SEG_L1_3_2, display_hours_12_or_24);
+	  case 0:		// Set delay
+	    display_chars(LCD_SEG_L2_4_0, (u8 *)"C-LEN", SEG_ON);
+	    set_value(&cyclelen, 4, 3, 1, 180, SETVALUE_DISPLAY_VALUE + SETVALUE_NEXT_VALUE + SETVALUE_FAST_MODE, LCD_SEG_L1_3_0, display_value1);
 	    select = 1;
 	    break;
 
-	  case 1:		// Set minutes
-	    set_value(&minutes, 2, 0, 0, 59, SETVALUE_ROLLOVER_VALUE + SETVALUE_DISPLAY_VALUE + SETVALUE_NEXT_VALUE, LCD_SEG_L1_1_0, display_value1);
+	  case 1:		// Set cycle length
+	    display_chars(LCD_SEG_L2_4_0, (u8 *)"DELAY", SEG_ON);
+	    set_value(&delay, 4, 3, 0, 60, SETVALUE_DISPLAY_VALUE + SETVALUE_NEXT_VALUE + SETVALUE_FAST_MODE, LCD_SEG_L1_3_0, display_value1);
 	    select = 0;
 	    break;
 	  }
