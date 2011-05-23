@@ -124,6 +124,9 @@ typedef union
     #ifdef CONFIG_ALARM
     u16 alarm_buzzer                    : 1;	// 1 = Output buzzer for alarm
     #endif
+    #ifdef CONFIG_CYCLE_ALARM
+    u16 cycle_alarm_buzzer              : 1;	// 1 = Output buzzer for cycle alarm
+    #endif
     #ifdef CONFIG_EGGTIMER
     u16 eggtimer_buzzer                 : 1;	// 1 = Output buzzer for eggtimer
     #endif

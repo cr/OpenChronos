@@ -366,7 +366,6 @@ __interrupt void TIMER0_A0_ISR(void)
 		// Measure battery voltage to keep track of remaining battery life
 		request.flag.voltage_measurement = 1;
 		#endif
-		
 		#ifdef CONFIG_ALARM
 		// If the chime is enabled, we beep here
 		if (sTime.minute == 0) {
@@ -376,6 +375,10 @@ __interrupt void TIMER0_A0_ISR(void)
 		}
 		// Check if alarm needs to be turned on
 		check_alarm();
+		#endif
+		#ifdef CONFIG_CYCLE_ALARM
+		// Check if cycle alarm needs to be turned on
+		check_cycle_alarm();
 		#endif
 		#ifdef CONFIG_ALTI_ACCUMULATOR
 		// Check if we need to do an altitude accumulation
@@ -411,7 +414,7 @@ __interrupt void TIMER0_A0_ISR(void)
 		// Decrement alarm duration counter
 		if (sCycleAlarm.duration-- > 0)
 		{
-			request.flag.alarm_buzzer = 1;
+			request.flag.cycle_alarm_buzzer = 1;
 		}
 		else
 		{
