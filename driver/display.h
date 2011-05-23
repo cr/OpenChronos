@@ -101,7 +101,9 @@ typedef union
 #ifdef CONFIG_CYCLE_ALARM
     u16 update_cycle_alarm     		: 1;    // 1 = Cycle Alarm was updated
 #endif
+#ifdef CONFIG_ALARM
     u16 update_alarm      		: 1;    // 1 = Alarm time was updated
+#endif
     u16 update_acceleration		: 1; 	// 1 = Acceleration data was updated
   } flag;
   u16 all_flags;            // Shortcut to all display flags (for reset)
