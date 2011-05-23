@@ -21,28 +21,20 @@ extern void display_cycle_alarm(u8 line, u8 update);
 // Defines section
 
 // Cycle alarm states
-#define CYCLE_ALARM_DISABLED 	(0u)
-#define CYCLE_ALARM_ENABLED	(1u)
-#define CYCLE_ALARM_ON		(2u)
-
-// Cycle alarm app states
-#define CYCLE_ALARM_SHOW_SUM	(0u)
-#define CYCLE_ALARM_WAIT	(1u)
-#define CYCLE_ALARM_SET_DELAY	(2u)
-#define CYCLE_ALARM_SET_LEN	(3u)
-#define CYCLE_ALARM_SET_CYCLES	(4u)
+#define CYCLE_ALARM_UNSET	(0u)
+#define CYCLE_ALARM_ACTIVE	(1u)
+#define CYCLE_ALARM_RINGING	(2u)
+#define CYCLE_ALARM_CONFIG	(3u)
 
 
-// Keep alarm for 10 on-off cycles
-#define CYCLE_ALARM_ON_DURATION	(10u)
+// Keep alarm for 64 on-off cycles
+#define CYCLE_ALARM_ON_DURATION	(64u)
 
 
 // *************************************************************************************************
 // Global Variable section
 struct cycle_alarm
 {
-	u8 hourly; //dummy
-	// CYCLE_ALARM_DISABLED, CYCLE_ALARM_ENABLED, CYCLE_ALARM_ON
 	u8 state;
 	// Alarm duration
 	u8 duration;
@@ -51,7 +43,7 @@ struct cycle_alarm
 	// Alarm minute
 	u8 minute;
 	// Sleep-in delay
-	u8 delay;
+	s8 delay;
 	// Cycle lenght
 	u8 cyclelen;
 	// Number of cycles before wake

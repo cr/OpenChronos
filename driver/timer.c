@@ -409,7 +409,7 @@ __interrupt void TIMER0_A0_ISR(void)
 
 #ifdef CONFIG_CYCLE_ALARM
 	// Generate alarm signal
-	if (sCycleAlarm.state == CYCLE_ALARM_ON) 
+	if (sCycleAlarm.state == CYCLE_ALARM_RINGING) 
 	{
 		// Decrement alarm duration counter
 		if (sCycleAlarm.duration-- > 0)

@@ -74,22 +74,22 @@ extern void menu_skip_next(line_t line); //ezchronos.c
 
 // *************************************************************************************************
 // @fn          reset_cycle_alarm
-// @brief       Resets cycle alarm data to 06:00 (4*90+0)
+// @brief       Resets cycle alarm data to default values
 // @param       none
 // @return      none
 // *************************************************************************************************
 void reset_cycle_alarm(void) 
 {
 	// Default sleep time 06:00 (4*90+0)
-	sCycleAlarm.delay = 00;		// minutes until sleeping in
-	sCycleAlarm.cyclelen = 90;	// sleep cycle length
-	sCycleAlarm.cycles = 4;		// number of cycles before alarm
-	sCycleAlarm.hour = 11;		// dummy alarm time hour
-	sCycleAlarm.minute = 11;	// dummy alarm time minute
+	sCycleAlarm.delay	= 5;		// minutes until sleeping in
+	sCycleAlarm.cyclelen	= 90;		// sleep cycle length
+	sCycleAlarm.cycles	= 0;		// number of cycles before alarm
+	sCycleAlarm.hour	= 0;		// dummy alarm time hour
+	sCycleAlarm.minute	= 0;		// dummy alarm time minute
 
 	// Alarm is initially off
-	sCycleAlarm.duration 	= CYCLE_ALARM_ON_DURATION;
-	sCycleAlarm.state 	= CYCLE_ALARM_DISABLED;
+	sCycleAlarm.duration	= CYCLE_ALARM_ON_DURATION;
+	sCycleAlarm.state	= CYCLE_ALARM_UNSET;
 }
 
 
@@ -99,10 +99,10 @@ void reset_cycle_alarm(void)
 // @param       none
 // @return      none
 // *************************************************************************************************
-void check_cycle_alarm(void) 
+void check_cycle_alarm(void)
 {
 	// Return if alarm is not enabled
-	if (sCycleAlarm.state != CYCLE_ALARM_ENABLED) return;
+	if (sCycleAlarm.state != CYCLE_ALARM_ACTIVE) return;
 	
 	// Compare current time and alarm time
 	// Start with minutes - only 1/60 probability to match
@@ -112,7 +112,7 @@ void check_cycle_alarm(void)
 		if (sTime.hour == sCycleAlarm.hour)
 		{
 			// Indicate that alarm is beeping
-			sCycleAlarm.state = CYCLE_ALARM_ON;
+			sCycleAlarm.state = CYCLE_ALARM_RINGING;
 		}
 	}
 }
@@ -126,11 +126,15 @@ void check_cycle_alarm(void)
 // *************************************************************************************************
 void stop_cycle_alarm(void) 
 {
-	// Indicate that alarm is disabled and inactive
-	sCycleAlarm.state = CYCLE_ALARM_DISABLED;
-	
 	// Stop buzzer
 	stop_buzzer();
+
+	// Indicate that alarm is disabled and inactive
+	sCycleAlarm.state = CYCLE_ALARM_UNSET;
+	sCycleAlarm.cycles = 0;
+	
+	// Clear alarm symbol
+	display_symbol(LCD_ICON_ALARM, SEG_OFF_BLINK_OFF);
 }
 
 
@@ -142,40 +146,22 @@ void stop_cycle_alarm(void)
 // *************************************************************************************************
 void sx_cycle_alarm(u8 line)
 {
-	u8 state;
-	s32 cycles;
-	s32 duration;	
-	cycles = 1;
-	// UP: Cycle through cycles
-	if(button.flag.up)
+	u16 time;
+
+	message.flag.block_line1 = 1;
+
+	if(button.flag.down)
 	{
-		// Toggle alarm state
-		if (sCycleAlarm.state == CYCLE_ALARM_DISABLED) {
-			if (sCycleAlarm.hourly == CYCLE_ALARM_DISABLED) {
-				sCycleAlarm.hourly = CYCLE_ALARM_ENABLED;
-				// Show "offh" message 
-				message.flag.prepare = 1;
-				message.flag.type_alarm_off_chime_on = 1;
-			} else if (sCycleAlarm.hourly == CYCLE_ALARM_ENABLED) {
-				sCycleAlarm.state = CYCLE_ALARM_ENABLED;
-				sCycleAlarm.hourly = CYCLE_ALARM_DISABLED;
-				// Show " on" message 
-				message.flag.prepare = 1;
-				message.flag.type_alarm_on_chime_off = 1;
-			}
-		} else if (sCycleAlarm.state == CYCLE_ALARM_ENABLED) {
-			if (sCycleAlarm.hourly == CYCLE_ALARM_DISABLED) {
-				sCycleAlarm.hourly = CYCLE_ALARM_ENABLED;
-				// Show " onh" message 
-				message.flag.prepare = 1;
-				message.flag.type_alarm_on_chime_on = 1;
-			} else if (sCycleAlarm.hourly == CYCLE_ALARM_ENABLED) {
-				sCycleAlarm.state = CYCLE_ALARM_DISABLED;
-				sCycleAlarm.hourly = CYCLE_ALARM_DISABLED;
-				// Show " off" message 
-				message.flag.prepare = 1;
-				message.flag.type_alarm_off_chime_off = 1;
-			}
+		sCycleAlarm.cycles = (sCycleAlarm.cycles+1)%9;
+		if(sCycleAlarm.cycles==0)
+		{
+			sCycleAlarm.state = CYCLE_ALARM_UNSET;
+		} else {
+			sCycleAlarm.state = CYCLE_ALARM_ACTIVE;
+			time = sTime.hour*60 + sTime.minute;
+			time += sCycleAlarm.cycles*sCycleAlarm.cyclelen + sCycleAlarm.delay;
+			sCycleAlarm.hour = time/60%24;
+			sCycleAlarm.minute = time%60;
 		}
 	}
 }
@@ -192,9 +178,8 @@ void mx_cycle_alarm(u8 line)
 	u8 select;
 	s32 delay;
 	s32 cyclelen;
-	s32 hour;
-	s32 minutes;
-	u8 * str;
+
+	sCycleAlarm.state = CYCLE_ALARM_CONFIG;
 	
 	// Clear display
 	clear_display_all();
@@ -212,14 +197,15 @@ void mx_cycle_alarm(u8 line)
 	  // Idle timeout: exit without saving
 	  if (sys.flag.idle_timeout) break;
 
-	  // STAR (short): save, then exit
-	  if (button.flag.star)
+	  // NUM (short): save, then exit
+	  if (button.flag.num)
 	  {
 	    // Store local variables in global alarm time
 	    sCycleAlarm.delay = delay;
 	    sCycleAlarm.cyclelen = cyclelen;
 	    // Set display update flag
 	    display.flag.line1_full_update = 1;
+	    display.flag.line2_full_update = 1;
 	    break;
 	  }
 
@@ -244,52 +230,88 @@ void mx_cycle_alarm(u8 line)
 
 	// Indicate to display function that new value is available
 	display.flag.update_cycle_alarm = 1;
+
+	sCycleAlarm.state = CYCLE_ALARM_UNSET;
+	sCycleAlarm.cycles = 0;
 }
 // *************************************************************************************************
 // @fn          nx_cycle_alarm
-// @brief       Disable alarm before advancing to next menu item
+// @brief       Clean up before advancing to next menu item
 // @param       u8 line	LINE1, LINE2
 // @return      none
 // *************************************************************************************************
 void nx_cycle_alarm(u8 line)
 {
-	sCycleAlarm.state == CYCLE_ALARM_DISABLED;
+	message.flag.block_line1 = 0;
+	message.flag.erase = 1;
+	display.flag.line1_full_update = 1;	
 	menu_skip_next(line);
 }
 
 // *************************************************************************************************
 // @fn          display_cycle_alarm
-// @brief       Display alarm time. 24H / 12H time format.
+// @brief       Display alarm screen. 24H / 12H time format.
 // @param       u8 line	LINE1, LINE2
 //		u8 update	DISPLAY_LINE_UPDATE_FULL, DISPLAY_LINE_CLEAR
 // @return      none
 // *************************************************************************************************
 void display_cycle_alarm(u8 line, u8 update)
 {
-	
+	s16 len;
+	s16 now;
+	s16 alarm;
+	s16 left;
+	u8 is_unset;
+
 	if (update == DISPLAY_LINE_UPDATE_FULL)			
 	{
-	  display_hours_12_or_24(switch_seg(line, LCD_SEG_L1_3_2, LCD_SEG_L2_3_2), sCycleAlarm.hour, 2, 1, SEG_ON);
-	  display_chars(switch_seg(line, LCD_SEG_L1_1_0, LCD_SEG_L2_1_0), itoa(sCycleAlarm.minute, 2, 0), SEG_ON);
-	  display_symbol(switch_seg(line, LCD_SEG_L1_COL, LCD_SEG_L2_COL0), SEG_ON);
+		len = sCycleAlarm.cycles*sCycleAlarm.cyclelen + sCycleAlarm.delay;
+		now = sTime.hour*60 + sTime.minute;
+		alarm = sCycleAlarm.hour*60 + sCycleAlarm.minute;
 
-	  // Show blinking alarm icon
-	  display_symbol(LCD_ICON_ALARM, SEG_ON_BLINK_ON);
+		is_unset = (sCycleAlarm.cycles==0);
+
+		if(is_unset)
+		{
+			display_symbol(LCD_ICON_ALARM, SEG_ON_BLINK_OFF);
+			display_symbol(LCD_SEG_L1_COL, SEG_ON_BLINK_ON);
+			display_symbol(LCD_SEG_L2_COL0, SEG_ON_BLINK_OFF);
+			len = 0;
+			alarm = now;
+		} else {
+			display_symbol(LCD_ICON_ALARM, SEG_ON_BLINK_ON);
+			display_symbol(LCD_SEG_L1_COL, SEG_ON_BLINK_OFF);
+			display_symbol(LCD_SEG_L2_COL0, SEG_ON_BLINK_ON);
+		}
+
+		left = alarm-now;
+		if( left<0 ) left += 24*60;
+
+		display_hours_12_or_24(LCD_SEG_L1_3_2, alarm/60, 2, 1, SEG_ON);
+		display_chars(LCD_SEG_L1_1_0, itoa(alarm%60, 2, 0), SEG_ON);
+		display_symbol(LCD_SEG_L1_DP0, SEG_OFF);
+		display_symbol(LCD_SEG_L1_DP1, SEG_OFF);
+
+		display_chars(LCD_SEG_L2_4, itoa(sCycleAlarm.cycles, 1, 0), SEG_ON);
+		display_chars(LCD_SEG_L2_3_2, itoa(left/60, 2, 1), SEG_ON);
+		display_chars(LCD_SEG_L2_1_0, itoa(left%60, 2, 0), SEG_ON);
+		display_symbol(LCD_SEG_L2_COL1, SEG_ON_BLINK_OFF);
+		display_symbol(LCD_SEG_L2_DP, SEG_OFF);
+
 	}
-	else if (update == DISPLAY_LINE_CLEAR)			
+	else if (update == DISPLAY_LINE_CLEAR)		
 	{
-	  // Clean up function-specific segments before leaving function
-	  display_symbol(LCD_SYMB_AM, SEG_OFF);
-
-	  // Clear / set alarm icon
-	  if (sCycleAlarm.state == CYCLE_ALARM_DISABLED)
-	  {
-	    display_symbol(LCD_ICON_ALARM, SEG_OFF_BLINK_OFF);
-	  }
-	  else
-	  {
-	    display_symbol(LCD_ICON_ALARM, SEG_ON_BLINK_OFF);
-	  }
+		// Clean up function-specific segments before leaving function
+		display_symbol(LCD_SYMB_AM, SEG_OFF);
+		display_symbol(LCD_SEG_L2_COL0, SEG_OFF);
+		display_symbol(LCD_SEG_L2_COL1, SEG_OFF);
+		display_symbol(LCD_SEG_L2_DP, SEG_OFF);
+		// Clear / set alarm icon
+		if(sCycleAlarm.cycles==0)
+			display_symbol(LCD_ICON_ALARM, SEG_OFF_BLINK_OFF);
+		else
+			display_symbol(LCD_ICON_ALARM, SEG_ON_BLINK_ON);
+			
 	}
 }
 #endif /* CONFIG_CYCLE_ALARM */

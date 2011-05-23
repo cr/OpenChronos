@@ -216,24 +216,12 @@ const struct menu menu_L1_Sidereal =
 };
 #endif
 
-// Line1 - Cycle Alarm
-#ifdef CONFIG_CYCLE_ALARM
-const struct menu menu_L1_CycleAlarm =
-{
-	FUNCTION(sx_cycle_alarm),	// direct function
-	FUNCTION(mx_cycle_alarm),	// sub menu function
-	FUNCTION(nx_cycle_alarm),	// next item function
-	FUNCTION(display_cycle_alarm),	// display function
-	FUNCTION(update_cycle_alarm),	// new display data
-};
-#endif
-
 // Line1 - Alarm
 #ifdef CONFIG_ALARM
 const struct menu menu_L1_Alarm =
 {
-	FUNCTION(sx_alarm),			// direct function
-	FUNCTION(mx_alarm),			// sub menu function
+	FUNCTION(sx_alarm),		// direct function
+	FUNCTION(mx_alarm),		// sub menu function
 	FUNCTION(menu_skip_next),	// next item function
 	FUNCTION(display_alarm),	// display function
 	FUNCTION(update_alarm),		// new display data
@@ -317,6 +305,19 @@ const struct menu menu_L2_Date =
 	FUNCTION(display_date),		// display function
 	FUNCTION(update_date),		// new display data
 };
+
+// Line2 - Cycle Alarm
+#ifdef CONFIG_CYCLE_ALARM
+const struct menu menu_L2_CycleAlarm =
+{
+	FUNCTION(sx_cycle_alarm),	// direct function
+	FUNCTION(mx_cycle_alarm),	// sub menu function
+	FUNCTION(nx_cycle_alarm),	// next item function
+	FUNCTION(display_cycle_alarm),	// display function
+	FUNCTION(update_cycle_alarm),	// new display data
+};
+#endif
+
 #ifdef CONFIG_VARIO
 //Line 2 - Vario
 const struct menu menu_L2_Vario = 
@@ -484,9 +485,6 @@ const struct menu *menu_L1[]={
 	#ifdef CONFIG_SIDEREAL
 	&menu_L1_Sidereal,
 	#endif
-	#ifdef CONFIG_CYCLE_ALARM
-	&menu_L1_CycleAlarm,
-	#endif
 	#ifdef CONFIG_ALARM
 	&menu_L1_Alarm,
 	#endif
@@ -512,6 +510,9 @@ int menu_L1_position=0;
 
 const struct menu *menu_L2[]={
 	&menu_L2_Date,
+	#ifdef CONFIG_CYCLE_ALARM
+	&menu_L2_CycleAlarm,
+	#endif
 	#ifdef CONFIG_VARIO
 	&menu_L2_Vario,
 	#endif

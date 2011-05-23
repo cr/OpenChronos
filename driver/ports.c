@@ -330,7 +330,7 @@ __interrupt void PORT2_ISR(void)
 		#endif
 		
 		#ifdef CONFIG_CYCLE_ALARM
-		if (sCycleAlarm.state == CYCLE_ALARM_ON) 
+		if (sCycleAlarm.state == CYCLE_ALARM_RINGING) 
 		{
 			stop_cycle_alarm();
 			button.all_flags = 0;

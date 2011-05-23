@@ -84,9 +84,6 @@ extern const struct menu menu_L1_Time;
 #ifdef CONFIG_SIDEREAL
 extern const struct menu menu_L1_Sidereal;
 #endif
-#ifdef CONFIG_CYCLE_ALARM
-extern const struct menu menu_L1_CycleAlarm;
-#endif
 #ifdef CONFIG_ALARM
 extern const struct menu menu_L1_Alarm;
 #endif
@@ -101,6 +98,9 @@ extern const struct menu menu_L1_Acceleration;
 
 // Line2 navigation
 extern const struct menu menu_L2_Date;
+#ifdef CONFIG_CYCLE_ALARM
+extern const struct menu menu_L2_CycleAlarm;
+#endif
 extern const struct menu menu_L2_Stopwatch;
 #ifdef CONFIG_EGGTIMER
 extern const struct menu menu_L2_Eggtimer;
