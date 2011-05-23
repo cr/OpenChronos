@@ -114,20 +114,22 @@ typedef union
 {
   struct
   {
-    u16 temperature_measurement 	: 1;    // 1 = Measure temperature
-    u16 voltage_measurement    		: 1;    // 1 = Measure voltage
-    u16 altitude_measurement    	: 1;    // 1 = Measure air pressure
-#ifdef CONFIG_ALTI_ACCUMULATOR
+    u16 temperature_measurement         : 1;	// 1 = Measure temperature
+    u16 voltage_measurement             : 1;	// 1 = Measure voltage
+    u16 altitude_measurement            : 1;	// 1 = Measure air pressure
+    #ifdef CONFIG_ALTI_ACCUMULATOR
     u16 altitude_accumulator            : 1;	// 1 = Measure altitude & accumulate it
-#endif
-    u16	acceleration_measurement	: 1; 	// 1 = Measure acceleration
-    u16 alarm_buzzer			: 1;	// 1 = Output buzzer for alarm
-#ifdef CONFIG_EGGTIMER
-    u16 eggtimer_buzzer : 1; // 1 = Output buzzer for eggtimer
-#endif
-#ifdef CONFIG_STRENGTH
-    u16 strength_buzzer 		: 1;    // 1 = Output buzzer from strength_data
-#endif
+    #endif
+    u16	acceleration_measurement        : 1; 	// 1 = Measure acceleration
+    #ifdef CONFIG_ALARM
+    u16 alarm_buzzer                    : 1;	// 1 = Output buzzer for alarm
+    #endif
+    #ifdef CONFIG_EGGTIMER
+    u16 eggtimer_buzzer                 : 1;	// 1 = Output buzzer for eggtimer
+    #endif
+    #ifdef CONFIG_STRENGTH
+    u16 strength_buzzer                 : 1;	// 1 = Output buzzer from strength_data
+    #endif
   } flag;
   u16 all_flags;            // Shortcut to all display flags (for reset)
 } s_request_flags;
