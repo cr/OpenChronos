@@ -93,15 +93,15 @@ typedef union
 {
   struct
   {
-    u16 idle_timeout      		: 1;    // Timeout after inactivity
+    u16 idle_timeout            : 1;    // Timeout after inactivity
     u16 idle_timeout_enabled    : 1;    // When in set mode, timeout after a given period
-    u16 lock_buttons			: 1;    // Lock buttons
-    u16 mask_buzzer		 		: 1;	// Do not output buzz for next button event
+    u16 lock_buttons            : 1;    // Lock buttons
+    u16 mask_buzzer             : 1;	// Do not output buzz for next button event
     u16 up_down_repeat_enabled  : 1;    // While in set_value(), create virtual UP/DOWN button events
-    u16 low_battery      		: 1;    // 1 = Battery is low
-    u16 use_metric_units		: 1;    // 1 = Use metric units, 0 = use English units
-    u16 am_pm_time          : 1;    // 1 = Display times as AM/PM else 24Hr
-    u16 delay_over     			: 1;    // 1 = Timer delay over
+    u16 low_battery             : 1;    // 1 = Battery is low
+    u16 use_metric_units        : 1;    // 1 = Use metric units, 0 = use English units
+    u16 am_pm_time              : 1;    // 1 = Display times as AM/PM else 24Hr
+    u16 delay_over              : 1;    // 1 = Timer delay over
     u16 no_beep                 : 1;    // Don't beep on key press
   } flag;
   u16 all_flags;            // Shortcut to all display flags (for reset)
@@ -139,20 +139,20 @@ typedef union
 {
   struct
   {
-    u16	prepare							: 1;	// 1 = Wait for clock tick, then set display.flag.show_message flag
-    u16	show							: 1;	// 1 = Display message now
-    u16 erase							: 1;	// 1 = Erase message
-    u16	type_locked						: 1;	// 1 = Show "buttons are locked" in Line2
-    u16 type_unlocked					: 1;	// 1 = Show "buttons are unlocked" in Line2
-    u16 type_lobatt						: 1;	// 1 = Show "lobatt" text in Line2
-    u16 type_alarm_off_chime_off		: 1;	// 1 = Show " off" text in Line1
-    u16 type_alarm_off_chime_on			: 1;	// 1 = Show " offh" text in Line1
-    u16 type_alarm_on_chime_off			: 1;	// 1 = Show "  on" text in Line1
-    u16 type_alarm_on_chime_on			: 1;	// 1 = Show " onh" text in Line1
-    u16 type_no_beep_on					: 1;	// 1 = Show " beep" text in Line2
-    u16 type_no_beep_off				: 1;	// 1 = Show "nobeep" text in Line2
-    u16 block_line1						: 1;	// 1 = block Line1 from updating until message erase
-    u16 block_line2						: 1;	// 1 = block Line2 from updating until message erase
+    u16	prepare                             : 1;	// 1 = Wait for clock tick, then set display.flag.show_message flag
+    u16	show                                : 1;	// 1 = Display message now
+    u16 erase                               : 1;	// 1 = Erase message
+    u16	type_locked                         : 1;	// 1 = Show "buttons are locked" in Line2
+    u16 type_unlocked                       : 1;	// 1 = Show "buttons are unlocked" in Line2
+    u16 type_lobatt                         : 1;	// 1 = Show "lobatt" text in Line2
+    u16 type_alarm_off_chime_off            : 1;	// 1 = Show " off" text in Line1
+    u16 type_alarm_off_chime_on             : 1;	// 1 = Show " offh" text in Line1
+    u16 type_alarm_on_chime_off             : 1;	// 1 = Show "  on" text in Line1
+    u16 type_alarm_on_chime_on              : 1;	// 1 = Show " onh" text in Line1
+    u16 type_no_beep_on                     : 1;	// 1 = Show " beep" text in Line2
+    u16 type_no_beep_off                    : 1;	// 1 = Show "nobeep" text in Line2
+    u16 block_line1                         : 1;	// 1 = block Line1 from updating until message erase
+    u16 block_line2                         : 1;	// 1 = block Line2 from updating until message erase
  } flag;
   u16 all_flags;            // Shortcut to all message flags (for reset)
 } s_message_flags;
