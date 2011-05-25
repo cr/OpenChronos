@@ -81,18 +81,10 @@ extern int menu_L2_position;
 
 // Line1 navigation
 extern const struct menu menu_L1_Time;
-#ifdef CONFIG_SIDEREAL
 extern const struct menu menu_L1_Sidereal;
-#endif
-#ifdef CONFIG_CYCLE_ALARM
 extern const struct menu menu_L1_CycleAlarm;
-#endif
-#ifdef CONFIG_ALARM
 extern const struct menu menu_L1_Alarm;
-#endif
-#ifdef CONFIG_ALTITUDE
 extern const struct menu menu_L1_Altitude;
-#endif
 extern const struct menu menu_L1_Temperature;
 extern const struct menu menu_L1_Altitude;
 extern const struct menu menu_L1_Heartrate;
@@ -102,39 +94,17 @@ extern const struct menu menu_L1_Acceleration;
 // Line2 navigation
 extern const struct menu menu_L2_Date;
 extern const struct menu menu_L2_Stopwatch;
-#ifdef CONFIG_EGGTIMER
 extern const struct menu menu_L2_Eggtimer;
-#endif
 extern const struct menu menu_L2_Battery;
 extern const struct menu menu_L2_Rf;
-#ifdef CONFIG_PHASE_CLOCK
 extern const struct menu menu_L2_Phase;
-#endif
-
-#ifdef CONFIG_USEPPT
 extern const struct menu menu_L2_Ppt;
-#endif
-
-#ifndef CONFIG_USE_SYNC_TOSET_TIME
 extern const struct menu menu_L2_Sync;
-#endif
-
 extern const struct menu menu_L2_CalDist;
-
-#ifndef CONFIG_USE_DISCRET_RFBSL
 extern const struct menu menu_L2_RFBSL;
-#endif
-
-#ifdef CONFIG_PROUT
 extern const struct menu menu_L2_Prout;
-#endif
-#ifdef CONFIG_VARIO
 extern const struct menu menu_L2_Vario;
-#endif
-
-#ifdef CONFIG_USE_GPS
 extern const struct menu menu_L2_Gps;
-#endif
 
 // Pointers to current menu item
 extern const struct menu * ptrMenu_L1;
