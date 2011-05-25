@@ -348,23 +348,27 @@ void init_global_variables(void)
 	// Force full display update when starting up
 	display.flag.full_update = 1;
 
-#ifndef ISM_US
+	#ifndef ISM_US
 	// Use metric units when displaying values
-    sys.flag.use_metric_units = 1;
-#else 
-#ifdef CONFIG_METRIC_ONLY
 	sys.flag.use_metric_units = 1;
-#endif
-#endif
+	#else 
+	#ifdef CONFIG_METRIC_ONLY
+	sys.flag.use_metric_units = 1;
+	#endif
+	#endif
+
+	#ifdef CONFIG_SILENT
+	// default to silent mode
+	sys.flag.no_beep = 1;
+	#endif
 	
 	// Read calibration values from info memory
 	read_calibration_values();
-#ifdef CONFIG_ALTI_ACCUMULATOR
+	#ifdef CONFIG_ALTI_ACCUMULATOR
 	// By default, don't have the altitude accumulator running
 	alt_accum_enable = 0;
-#endif
-	
-	
+	#endif
+		
 	#ifdef CONFIG_INFOMEM
 	if(infomem_ready()==-2)
 	{

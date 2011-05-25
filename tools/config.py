@@ -61,7 +61,6 @@ DATA["THIS_DEVICE_ADDRESS"] = {
         "help": "Default Radio Hardware Address to use on the device",
 }
 
-
 DATA["USE_LCD_CHARGE_PUMP"] = {
         "name": "Use LCD Charge Pump (6 bytes)",
         "default": False,
@@ -81,12 +80,18 @@ DATA["USE_WATCHDOG"] = {
 # 		"help": "Automaticly sync clock after reboot",
 # }
 
-
 DATA["DEBUG"] = {
         "name": "Debug",
         "default": False,
         "help": "Activates debug code",
         }
+
+DATA["CONFIG_SILENT"] = {
+		"name": "Silent mode (6 bytes)",
+		"depends": [],
+		"default": False,
+		"help": "Make silent mode default, so key presses don't beep. Toggle by holding *+UP",
+}
 
 # modules
 
