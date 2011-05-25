@@ -199,7 +199,7 @@ DATA["CONFIG_CYCLE_ALARM"] = {
 
 # not yet working
 DATA["CONFIG_ALARM"] = {
-        "name": "Alarm (608 bytes)",
+        "name": "Alarm (872 bytes)",
         "depends": [],
         "default": True}
 DATA["CONFIG_BATTERY"] = {
