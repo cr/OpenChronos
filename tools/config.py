@@ -191,7 +191,7 @@ DATA["CONFIG_STRENGTH"] = {
 }
 
 DATA["CONFIG_CYCLE_ALARM"] = {
-        "name": "Cycle Alarm (1150 bytes)",
+        "name": "Cycle Alarm (1180 bytes)",
         "depends": [],
         "default": False,
         "help": "Alarm clock for cycle-aware relative sleepers who want to sleep 4.5, 6, 7.5 (etc.) hours whenever they go to bed."
