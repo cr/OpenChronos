@@ -80,14 +80,14 @@ extern void menu_skip_next(line_t line); //ezchronos.c
 // *************************************************************************************************
 void reset_cycle_alarm(void) 
 {
-	// Default sleep time 06:00 (4*90+0)
+	// default values
 	sCycleAlarm.delay	= 5;		// minutes until sleeping in
 	sCycleAlarm.cyclelen	= 90;		// sleep cycle length
 	sCycleAlarm.cycles	= 0;		// number of cycles before alarm
-	sCycleAlarm.hour	= 0;		// dummy alarm time hour
-	sCycleAlarm.minute	= 0;		// dummy alarm time minute
+	//sCycleAlarm.hour	= 0;		// dummy alarm time hour
+	//sCycleAlarm.minute	= 0;		// dummy alarm time minute
 
-	// Alarm is initially off
+	// initital state is UNSET
 	sCycleAlarm.duration	= CYCLE_ALARM_ON_DURATION;
 	sCycleAlarm.state	= CYCLE_ALARM_UNSET;
 }
@@ -101,7 +101,7 @@ void reset_cycle_alarm(void)
 // *************************************************************************************************
 void check_cycle_alarm(void)
 {
-	// Return if alarm is not enabled
+	// Return if alarm is not ACTIVE
 	if (sCycleAlarm.state != CYCLE_ALARM_ACTIVE) return;
 	
 	// Compare current time and alarm time
@@ -111,7 +111,7 @@ void check_cycle_alarm(void)
 	{
 		if (sTime.hour == sCycleAlarm.hour)
 		{
-			// Indicate that alarm is beeping
+			// set alarm state to RINGING
 			sCycleAlarm.state = CYCLE_ALARM_RINGING;
 		}
 	}
@@ -126,14 +126,14 @@ void check_cycle_alarm(void)
 // *************************************************************************************************
 void stop_cycle_alarm(void) 
 {
-	// Stop buzzer
+	// stop buzzer
 	stop_buzzer();
 
-	// Indicate that alarm is disabled and inactive
+	// return alarm state to UNSET
 	sCycleAlarm.state = CYCLE_ALARM_UNSET;
 	sCycleAlarm.cycles = 0;
 	
-	// Clear alarm symbol
+	// clear bell segment
 	display_symbol(LCD_ICON_ALARM, SEG_OFF_BLINK_OFF);
 }
 
@@ -141,16 +141,14 @@ void stop_cycle_alarm(void)
 // *************************************************************************************************
 // @fn          sx_cycle_alarm
 // @brief       Sx button turns alarm on/off.
-// @param       u8 line		LINE1
+// @param       u8 line		LINE1, LINE2
 // @return      none
 // *************************************************************************************************
 void sx_cycle_alarm(u8 line)
 {
 	u16 time;
 
-	message.flag.block_line1 = 1;
-
-	if(button.flag.down)
+	if(line==LINE1 ? button.flag.up : button.flag.down)
 	{
 		sCycleAlarm.cycles = (sCycleAlarm.cycles+1)%9;
 		if(sCycleAlarm.cycles==0)
@@ -170,7 +168,7 @@ void sx_cycle_alarm(u8 line)
 // *************************************************************************************************
 // @fn          mx_cycle_alarm
 // @brief       Set cycle alarm parameters
-// @param       u8 line		LINE1
+// @param       u8 line		LINE1, LINE2
 // @return      none
 // *************************************************************************************************
 void mx_cycle_alarm(u8 line)
@@ -179,9 +177,10 @@ void mx_cycle_alarm(u8 line)
 	s32 delay;
 	s32 cyclelen;
 
+	// enter config state
 	sCycleAlarm.state = CYCLE_ALARM_CONFIG;
 	
-	// Clear display
+	// clear display
 	clear_display_all();
 
 	// Keep global values in case new values are discarded
@@ -197,8 +196,8 @@ void mx_cycle_alarm(u8 line)
 	  // Idle timeout: exit without saving
 	  if (sys.flag.idle_timeout) break;
 
-	  // NUM (short): save, then exit
-	  if (button.flag.num)
+	  // STAR/NUM (short): save, then exit
+	  if (line==LINE1 ? button.flag.star : button.flag.num)
 	  {
 	    // Store local variables in global alarm time
 	    sCycleAlarm.delay = delay;
@@ -211,26 +210,33 @@ void mx_cycle_alarm(u8 line)
 
 	  switch (select)
 	  {
-	  case 0:		// Set delay
+	  case 0:
+	    // set cycle length
 	    display_chars(LCD_SEG_L2_4_0, (u8 *)"C-LEN", SEG_ON);
-	    set_value(&cyclelen, 4, 3, 1, 180, SETVALUE_DISPLAY_VALUE + SETVALUE_NEXT_VALUE + SETVALUE_FAST_MODE, LCD_SEG_L1_3_0, display_value1);
+	    set_value(&cyclelen, 4, 3, 1, 180,
+		SETVALUE_DISPLAY_VALUE|SETVALUE_NEXT_VALUE|SETVALUE_FAST_MODE,
+		LCD_SEG_L1_3_0, display_value1);
 	    select = 1;
 	    break;
 
-	  case 1:		// Set cycle length
+	  case 1:
+	    // set sleep-in delay
 	    display_chars(LCD_SEG_L2_4_0, (u8 *)"DELAY", SEG_ON);
-	    set_value(&delay, 4, 3, 0, 60, SETVALUE_DISPLAY_VALUE + SETVALUE_NEXT_VALUE + SETVALUE_FAST_MODE, LCD_SEG_L1_3_0, display_value1);
+	    set_value(&delay, 4, 3, 0, 60,
+		SETVALUE_DISPLAY_VALUE|SETVALUE_NEXT_VALUE|SETVALUE_FAST_MODE,
+		LCD_SEG_L1_3_0, display_value1);
 	    select = 0;
 	    break;
 	  }
 	}
 
-	// Clear button flag
+	// clear button flags
 	button.all_flags = 0;
 
-	// Indicate to display function that new value is available
+	// indicate to display function that new value is available
 	display.flag.update_cycle_alarm = 1;
 
+	// reset alarm state
 	sCycleAlarm.state = CYCLE_ALARM_UNSET;
 	sCycleAlarm.cycles = 0;
 }
@@ -242,9 +248,6 @@ void mx_cycle_alarm(u8 line)
 // *************************************************************************************************
 void nx_cycle_alarm(u8 line)
 {
-	message.flag.block_line1 = 0;
-	message.flag.erase = 1;
-	display.flag.line1_full_update = 1;	
 	menu_skip_next(line);
 }
 
@@ -260,58 +263,79 @@ void display_cycle_alarm(u8 line, u8 update)
 	s16 len;
 	s16 now;
 	s16 alarm;
-	s16 left;
+	s16 remain;
 	u8 is_unset;
+
+	// setting of 0 cycles indicates inactive alarm 
+	is_unset = (sCycleAlarm.cycles==0);
 
 	if (update == DISPLAY_LINE_UPDATE_FULL)			
 	{
+		// friendly take over of LINE2, preventing other updates
+		message.flag.block_line2 = 1;
+
+		// all calculation in minutes % 24*60
 		len = sCycleAlarm.cycles*sCycleAlarm.cyclelen + sCycleAlarm.delay;
 		now = sTime.hour*60 + sTime.minute;
 		alarm = sCycleAlarm.hour*60 + sCycleAlarm.minute;
 
-		is_unset = (sCycleAlarm.cycles==0);
-
+		// set state-specific segments
 		if(is_unset)
 		{
+			// static bell indicating inactive alarm
 			display_symbol(LCD_ICON_ALARM, SEG_ON_BLINK_OFF);
+			// blinking colon in LINE1 for active time display
 			display_symbol(LCD_SEG_L1_COL, SEG_ON_BLINK_ON);
+			// static right colon in LINE2 for 0:00
 			display_symbol(LCD_SEG_L2_COL0, SEG_ON_BLINK_OFF);
 			len = 0;
 			alarm = now;
 		} else {
+			// blinking bell indicating active alarm
 			display_symbol(LCD_ICON_ALARM, SEG_ON_BLINK_ON);
+			// static colon in LINE1 for static alarm time display
 			display_symbol(LCD_SEG_L1_COL, SEG_ON_BLINK_OFF);
+			// blinking right colon in LINE2 for remaining time
 			display_symbol(LCD_SEG_L2_COL0, SEG_ON_BLINK_ON);
 		}
 
-		left = alarm-now;
-		if( left<0 ) left += 24*60;
+		// calculate remaining sleep time
+		remain = alarm-now;
+		if( remain<0 ) remain += 24*60;
 
+		// LINE1 inactive: <current:time>
+		//       active: <alarm:time>
 		display_hours_12_or_24(LCD_SEG_L1_3_2, alarm/60, 2, 1, SEG_ON);
 		display_chars(LCD_SEG_L1_1_0, itoa(alarm%60, 2, 0), SEG_ON);
 		display_symbol(LCD_SEG_L1_DP0, SEG_OFF);
 		display_symbol(LCD_SEG_L1_DP1, SEG_OFF);
 
+		// LINE2: <cycles>: <remaining:time>
 		display_chars(LCD_SEG_L2_4, itoa(sCycleAlarm.cycles, 1, 0), SEG_ON);
-		display_chars(LCD_SEG_L2_3_2, itoa(left/60, 2, 1), SEG_ON);
-		display_chars(LCD_SEG_L2_1_0, itoa(left%60, 2, 0), SEG_ON);
+		display_chars(LCD_SEG_L2_3_2, itoa(remain/60, 2, 1), SEG_ON);
+		display_chars(LCD_SEG_L2_1_0, itoa(remain%60, 2, 0), SEG_ON);
 		display_symbol(LCD_SEG_L2_COL1, SEG_ON_BLINK_OFF);
 		display_symbol(LCD_SEG_L2_DP, SEG_OFF);
 
 	}
 	else if (update == DISPLAY_LINE_CLEAR)		
 	{
-		// Clean up function-specific segments before leaving function
+		// clean up segments before leaving function
 		display_symbol(LCD_SYMB_AM, SEG_OFF);
 		display_symbol(LCD_SEG_L2_COL0, SEG_OFF);
 		display_symbol(LCD_SEG_L2_COL1, SEG_OFF);
-		display_symbol(LCD_SEG_L2_DP, SEG_OFF);
-		// Clear / set alarm icon
-		if(sCycleAlarm.cycles==0)
+		//display_symbol(LCD_SEG_L2_DP, SEG_OFF);
+
+		// clear or set bell according to alarm activity state
+		if(is_unset)
 			display_symbol(LCD_ICON_ALARM, SEG_OFF_BLINK_OFF);
 		else
 			display_symbol(LCD_ICON_ALARM, SEG_ON_BLINK_ON);
-			
+
+		// release LINE2 updates for other app
+		message.flag.block_line2 = 0;
+		message.flag.erase = 1;
+		display.flag.line2_full_update = 1;
 	}
 }
 #endif /* CONFIG_CYCLE_ALARM */

@@ -36,18 +36,18 @@ extern void display_cycle_alarm(u8 line, u8 update);
 struct cycle_alarm
 {
 	u8 state;
-	// Alarm duration
-	u8 duration;
+	// Sleep-in delay
+	s8 delay;
+	// Cycle length
+	u8 cyclelen;
+	// Number of cycles before alarm
+	u8 cycles;
 	// Alarm hour
 	u8 hour;
 	// Alarm minute
 	u8 minute;
-	// Sleep-in delay
-	s8 delay;
-	// Cycle lenght
-	u8 cyclelen;
-	// Number of cycles before wake
-	u8 cycles;
+	// Alarm duration
+	u8 duration;
 };
 extern struct cycle_alarm sCycleAlarm;
 
