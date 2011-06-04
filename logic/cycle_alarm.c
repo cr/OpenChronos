@@ -32,7 +32,7 @@
 //	  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // *************************************************************************************************
-// Alarm routines.
+// Cycle Alarm routines.
 // *************************************************************************************************
 
 
@@ -148,7 +148,11 @@ void sx_cycle_alarm(u8 line)
 {
 	u16 time;
 
-	if(line==LINE1 ? button.flag.up : button.flag.down)
+	#ifdef CONFIG_CYCLE_ALARM_LINE2
+	if(button.flag.down)
+	#else
+	if(button.flag.up)
+	#endif
 	{
 		sCycleAlarm.cycles = (sCycleAlarm.cycles+1)%9;
 		if(sCycleAlarm.cycles==0)
@@ -197,14 +201,15 @@ void mx_cycle_alarm(u8 line)
 	  if (sys.flag.idle_timeout) break;
 
 	  // STAR/NUM (short): save, then exit
-	  if (line==LINE1 ? button.flag.star : button.flag.num)
+	  #ifdef CONFIG_CYCLE_ALARM_LINE2
+	  if(button.flag.num)
+	  #else
+	  if(button.flag.star)
+	  #endif
 	  {
 	    // Store local variables in global alarm time
 	    sCycleAlarm.delay = delay;
 	    sCycleAlarm.cyclelen = cyclelen;
-	    // Set display update flag
-	    display.flag.line1_full_update = 1;
-	    display.flag.line2_full_update = 1;
 	    break;
 	  }
 
@@ -234,6 +239,12 @@ void mx_cycle_alarm(u8 line)
 	button.all_flags = 0;
 
 	// indicate to display function that new value is available
+	// Set display update flag
+	#ifdef CONFIG_CYCLE_ALARM_LINE2
+	//display.flag.line2_full_update = 1;
+	#else
+	//display.flag.line1_full_update = 1;
+	#endif
 	display.flag.update_cycle_alarm = 1;
 
 	// reset alarm state
@@ -271,8 +282,12 @@ void display_cycle_alarm(u8 line, u8 update)
 
 	if (update == DISPLAY_LINE_UPDATE_FULL)			
 	{
-		// friendly take over of LINE2, preventing other updates
+		// friendly take over of LINE2/LINE1, preventing other updates
+		#ifdef CONFIG_CYCLE_ALARM_LINE2
+		message.flag.block_line1 = 1;
+		#else
 		message.flag.block_line2 = 1;
+		#endif
 
 		// all calculation in minutes % 24*60
 		len = sCycleAlarm.cycles*sCycleAlarm.cyclelen + sCycleAlarm.delay;
@@ -332,10 +347,15 @@ void display_cycle_alarm(u8 line, u8 update)
 		else
 			display_symbol(LCD_ICON_ALARM, SEG_ON_BLINK_ON);
 
-		// release LINE2 updates for other app
+		// release LINE2/LINE1 updates for other app
+		#ifdef CONFIG_CYCLE_ALARM_LINE2
+		message.flag.block_line1 = 0;
+		display.flag.line1_full_update = 1;
+		#else
 		message.flag.block_line2 = 0;
-		message.flag.erase = 1;
 		display.flag.line2_full_update = 1;
+		#endif
+		message.flag.erase = 1;
 	}
 }
 #endif /* CONFIG_CYCLE_ALARM */

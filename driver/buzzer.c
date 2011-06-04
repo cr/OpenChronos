@@ -48,9 +48,7 @@
 #include "display.h"
 
 // logic
-#ifdef CONFIG_CYCLE_ALARM
 #include "cycle_alarm.h"
-#endif
 #include "alarm.h"
 
 

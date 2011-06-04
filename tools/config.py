@@ -166,7 +166,6 @@ DATA["CONFIG_SIDEREAL"] = {
                 "This does NOT replace the normal clock which is still available and working."
         }
 
-
 DATA["CONFIG_INFOMEM"] = {
         "name": "Information Memory Driver (2934 bytes, requires sidereal clock)",
         "depends": [],
@@ -174,7 +173,6 @@ DATA["CONFIG_INFOMEM"] = {
         "help": "Build driver for usage of the Information Memory.\n"
                 "COMPILATION WILL LIKELY FAIL WITH mspgcc4 <20100829 !"
         }
-
 
 DATA["CONFIG_ACCEL"] = {
         "name": "Acceleration (1232 bytes)",
@@ -195,6 +193,13 @@ DATA["CONFIG_CYCLE_ALARM"] = {
         "depends": [],
         "default": False,
         "help": "Alarm clock for cycle-aware relative sleepers who want to sleep 4.5, 6, 7.5 (etc.) hours whenever they go to bed."
+}
+
+DATA["CONFIG_CYCLE_ALARM_LINE2"] = {
+        "name": "  move Cycle Alarm to line 2",
+        "depends": ["CONFIG_CYCLE_ALARM"],
+        "default": False,
+        "help": "Usually Cycle Alarm runs in line 1, so check this if you prefer it to run in line 2."
 }
 
 # not yet working

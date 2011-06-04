@@ -121,11 +121,11 @@ typedef union
     u16 altitude_accumulator            : 1;	// 1 = Measure altitude & accumulate it
     #endif
     u16	acceleration_measurement        : 1; 	// 1 = Measure acceleration
-    #ifdef CONFIG_ALARM
-    u16 alarm_buzzer                    : 1;	// 1 = Output buzzer for alarm
-    #endif
     #ifdef CONFIG_CYCLE_ALARM
     u16 cycle_alarm_buzzer              : 1;	// 1 = Output buzzer for cycle alarm
+    #endif
+    #ifdef CONFIG_ALARM
+    u16 alarm_buzzer                    : 1;	// 1 = Output buzzer for alarm
     #endif
     #ifdef CONFIG_EGGTIMER
     u16 eggtimer_buzzer                 : 1;	// 1 = Output buzzer for eggtimer

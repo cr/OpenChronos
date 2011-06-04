@@ -93,6 +93,7 @@ extern const struct menu menu_L1_Acceleration;
 
 // Line2 navigation
 extern const struct menu menu_L2_Date;
+extern const struct menu menu_L2_CycleAlarm;
 extern const struct menu menu_L2_Stopwatch;
 extern const struct menu menu_L2_Eggtimer;
 extern const struct menu menu_L2_Battery;

@@ -57,10 +57,8 @@
 // logic
 #include "menu.h"
 #include "date.h"
-#include "alarm.h"
-#ifdef CONFIG_CYCLE_ALARM
 #include "cycle_alarm.h"
-#endif
+#include "alarm.h"
 #include "stopwatch.h"
 #include "battery.h"
 #ifdef CONFIG_TEMP

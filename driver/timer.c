@@ -56,9 +56,7 @@
 #include "clock.h"
 #include "battery.h"
 #include "stopwatch.h"
-#ifdef CONFIG_CYCLE_ALARM
 #include "cycle_alarm.h"
-#endif
 #include "alarm.h"
 #include "altitude.h"
 #include "display.h"

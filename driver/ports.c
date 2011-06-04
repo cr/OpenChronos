@@ -54,9 +54,7 @@
 
 // logic
 #include "clock.h"
-#ifdef CONFIG_CYCLE_ALARM
 #include "cycle_alarm.h"
-#endif
 #include "alarm.h"
 #include "rfsimpliciti.h"
 #include "simpliciti.h"
